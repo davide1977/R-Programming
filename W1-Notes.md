@@ -78,7 +78,7 @@ You don't get an error, but... Least common denominator
 
 **y <-  c("a", TRUE)** *##Numeric*
 
-*Explicit coercition
+*Explicit coercition*
 
 x<-0:6
 
@@ -91,7 +91,7 @@ as.logical(x)
 as.character(x)
 > [1] "0" "1" "2" "3" "4" "5" "6"
 
-*Sometimes coercition can't work
+*Sometimes coercition can't work*
 
 ex.
 
@@ -114,6 +114,52 @@ x
 [1] TRUE
 
 [[4]]
-[1] 1+4i
+[1] 1+4i**
 
+## Data Types - Matrices
+
+**m <- matrix(,ncol = 2, nrow =3)
+> m
+     [,1] [,2]
+[1,]   NA   NA
+[2,]   NA   NA
+[3,]   NA   NA
+
+> dim(m)
+[1] 3 2
+> attributes(m)
+$dim
+[1] 3 2**
+
+*Matrices are constructed column-wise: data are filled BY COLUMNS*
+
+**> m <- matrix(1:6,ncol = 3, nrow =2)
+> m
+     [,1] [,2] [,3]
+[1,]    1    3    5
+[2,]    2    4    6**
+
+*Create a Matrix by add dimension attribute to a vector*
+
+m <- 1:10
+> [1] 1 2 3 4 5 6 7 8 9 10
+> dim(m) <-c(2,5)
+> m
+     [,1] [,2] [,3] [,4] [,5]
+[1,]    1    3    5    7    9
+[2,]    2    4    6    8   10
+
+*Create a Matrix by column or row binding*
+
+> x <- 1:3
+> y <- 10:12
+> cbind(x, y)
+     x  y
+[1,] 1 10
+[2,] 2 11
+[3,] 3 12
+> rbind(x,y)
+  [,1] [,2] [,3]
+x    1    2    3
+y   10   11   12
 
