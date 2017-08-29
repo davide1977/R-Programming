@@ -1,0 +1,119 @@
+## R-Console Input and Evaluation
+
+**x <- 1** *##Assignement operator*
+**print(x)**
+**x**
+**msg <- "hello"**
+
+**x <- 1:10** *#create a sequence*
+
+## Data Types - R Objects and Attributes
+
+R objects can have attributes
+
+* names, dimnames
+* dimensions (ex. matrices, arrays etc.)
+* class (integer, numeric, logical, character, complex)
+* Length
+* Other used-defined attributes/metadata
+
+A Vector can only contain objects of the same class
+
+A List is represented as a vector but can contain objects of different classes
+
+**class(x)**
+**typeof(x)**
+
+**attributes()** function to set or modify attributes
+
+### Numbers
+
+**x<- 5**
+**class(x)**
+**> [1] Numeric**
+
+**x<- 5.9**
+**class(x)**
+**> [1] Numeric**
+
+*L Suffix to explicitly ask a integer*
+
+**x<- 5L**
+**class(x)**
+**> [1] Integer**
+
+*Inf* number (1/0)
+*NaN* number (1/Inf)
+
+## Data Types - Vectors and Lists
+
+*Create a vector with c() function*
+
+x<-c(0.5,0.6) *## numeric*
+
+x <- c(TRUE,FALSE) *## logical*
+
+x <- c(T,F) *## logical*
+
+x <- c("a","b", "c") *## character*
+
+x <- 10:20 *## integer*
+
+x<-c(1L, 2L, 3L) *## integer*
+
+x<- c(1+0i, 2+4i) *## complex*
+
+*Create a vector with vector() function*
+
+x <- vector("numeric", length = 10)
+x <- vector(mode = "numeric", length = 10)
+
+*Mixing values*
+
+You don't get an error, but... Least common denominator
+
+**y <-  c(1.7, "a")** *##Least common denominator : character*
+
+**y <-  c(TRUE, 2)** *##Numeric*
+
+**y <-  c("a", TRUE)** *##Numeric*
+
+*Explicit coercition
+
+x<-0:6
+
+class(x)
+>[1] Integer
+as.numeric(x)
+> [1] 0 1 2 3 4 5 6
+as.logical(x)
+> [1] FALSE TRUE TRUE TRUE TRUE TRUE TRUE
+as.character(x)
+> [1] "0" "1" "2" "3" "4" "5" "6"
+
+*Sometimes coercition can't work
+
+ex.
+
+x <-c("a", "b", "c")
+as.numeric(x)
+>[1] NA NA NA
+
+### Lists
+
+**x <- list(1, "a", TRUE, 1+4i)
+x
+
+[[1]]
+[1] 1
+
+[[2]]
+[1] "true"
+
+[[3]]
+[1] TRUE
+
+[[4]]
+[1] 1+4i
+
+
