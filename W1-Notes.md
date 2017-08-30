@@ -234,3 +234,4 @@ NA is not NaN
 				[1] FALSE FALSE  TRUE FALSE FALSE FALSE
 
 NaN is NA
+
