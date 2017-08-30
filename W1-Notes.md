@@ -200,3 +200,37 @@ The order of the levels can be set using **levels** argument to **factor()**
 				Levels: yes no
 
 The *baseline* level is the first level in the factor ("yes" in this case), R language set normally the levels in alphabetical order. To override this, you have to change explicetely the levels.
+
+## Data Types - Missing Values
+
+**is.na()**
+
+Used to test objects if they are **NA** (Missing value)
+
+NA values have a class also (you can have integer NA, character NA etc.)
+
+**is.nan()**
+
+Used to test objects if they are **NaN** (Undefined mathematical operations ex. )
+
+NaN is also NA but the contrary is not true
+
+Exemples :
+				> x <- c(1,2,NA,10,3)
+				> x
+				[1]  1  2 NA 10  3
+				> is.na(x)
+				[1] FALSE FALSE  TRUE FALSE FALSE
+				> is.nan(x)
+				[1] FALSE FALSE FALSE FALSE FALSE
+
+
+NA is not NaN
+
+				> x <- c(1,2,NaN,NA,10,3)
+				> is.na(x)
+				[1] FALSE FALSE  TRUE  TRUE FALSE FALSE
+				> is.nan(x)
+				[1] FALSE FALSE  TRUE FALSE FALSE FALSE
+
+NaN is NA
