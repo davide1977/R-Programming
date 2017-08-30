@@ -235,3 +235,143 @@ NA is not NaN
 
 NaN is NA
 
+## Data Types - Data Frames
+
+Key data type in R, used to store tabular data. They're special type of list where every element **has to have the same length** (it means: every column of the table has the same length)
+
+* Every element of the list can be thought as a column, and the length of each element is the number of rows
+
+* unlike matrices, data frames can store different classes of objects (like lists)
+
+* Every row of a data frame has a name (an attribute called **row.names()** this can be useful : each row can represent a subject enrolled into a study, and the row name can be the subject ID, for exemple...
+
+* data frames are usually created with **read.table()** or **read.csv()** functions (but also **data.frame()** function)
+
+* you can convert a data frame to a matrix with **data.matrix()** function : but if you have different classes of objects, you'll have coercition and the result'll not be not what you expect.
+
+				> x <- data.frame(foo = 1:4, bar = c(T, T, F, F))
+				> x
+				  foo   bar
+				1   1  TRUE
+				2   2  TRUE
+				3   3 FALSE
+				4   4 FALSE
+				> nrow(x)
+				[1] 4
+				> ncol(x)
+				[1] 2
+
+if you don't specify a row.names() R will name that 1,2,3,4 etc.
+
+## Data Types - Name Attributes
+
+R Objects can have *names* : this is true for Data Frames, but also for all the other objects : **very usdeful to write readable code and self-describing objects!!**
+
+				> x <- 1:3
+				> names(x)
+				NULL
+				> names(x) <-c("foo", "bar", "norf")
+				> x
+				 foo  bar norf 
+				   1    2    3 
+				> names(x)
+				[1] "foo"  "bar"  "norf"
+
+For Lists :
+
+				> x <- list(a = 1, b = 2, c = 3)
+				> x
+				$a
+				[1] 1
+
+				$b
+				[1] 2
+
+				$c
+				[1] 3
+
+For matrices (dimnames) assigning a list, where the first element of the list is a vector of row names, and the second element is a vector of column names :
+
+				> m <- matrix(1:4, nrow = 2, ncol = 2)
+				> dimnames(m) <- list(c("a", "b"), c("c", "d"))
+				> m
+				  c d
+				a 1 3
+				b 2 4
+
+
+## Data Types - Summary
+
+Data Types :
+
+* Atomic classes : numeric, logical, character, integer, complex
+* vectors (only elements of the same class), lists (elements of all classes)
+* factors (categorical data)
+* missing values (Na, NaN)
+* data frames (Used to store tabular data with differents classes each col)
+* names (all objects can have name: useful to have self describing data)
+
+## Reading Tabular Data
+
+### Reading Data
+
+* **read.table**, **read.csv** for reading tabular data in text files and return a data frame in R-Console
+
+* **readLines**, reading lines in a text file (any type of file: return a vector of text)
+
+* **source** read R code files (inverse of **dump**)
+
+* **dget** also reading R code for R objects that have benn dparsed (**dpars**) into text files
+
+* **load** reads saved workspaces
+
+* **unserialize** read single R objects in binary forms
+
+### Writing Data
+
+* **write.table**
+
+* **writeLines**
+
+* **dump**
+
+* **dput**
+
+* **save**
+
+* **serialize**
+
+### read.table
+
+The most common function to read data. This are its arguments :
+
+* **file** name of the file/connection
+
+* **header** indicates if the file has a header that is not a data to read
+
+* **sep** indicate the separator of the "table" in the file
+
+* **colClasses** (not required) character vector which length is the same as the number of the columns of the data set and indicates what is the class of each column of the data set
+
+* **nrows** (not required) nr of the rows in the dataset
+
+* **comment.char** the default is the # indicate the eventual comment character in the dataset (everything on the right of the symbol on the same line is ignored)
+
+* **skip** number of lines to skip from the beginning
+
+* **stringAsFactors** - default to TRUE - if you want to code character variable to factors
+
+For small Datasets you can usually call read.table without any argiments (only name of the text file)
+
+				data <- read.table("foo.txt")
+
+R will automatically do :
+
+* skip lines that begins with a #
+* figure out how many rows there are
+* figure out what type of variable is in each column of the table
+
+if you specify arguments R will run faster and more efficiently
+
+* **read.csv** is identical to **read.table** except the default separator is a comma, and header is always equal to TRUE
+
