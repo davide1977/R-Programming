@@ -163,3 +163,40 @@ ex.
 				x    1    2    3
 				y   10   11   12
 
+## Data Types - Factors
+
+Factors represents *categorical data* and *can be ordered or unordered* = integer vector where each integer has a *label*
+
+* factors are treated specially by modeling function like **lm()** and **glm()**
+
+* factors are better than integer because factors are self-describing
+
+factors can be created by **factor()** function and the input of this function is a character vector :
+				> x <- factor (c("yes", "yes", "no", "yes", "no"))
+				> x
+				[1] yes yes no  yes no 
+				Levels: no yes
+
+So we created a factor with two levels ("yes" and "no") ; the factor prints differently than a character vector (with separate attribute "Levels")
+
+The function **table()** on the factor prints the frequency of each level there are in the factor :
+
+				> table(x)
+				x
+				no yes 
+				  2   3 
+
+we can use the **unclass()** function that strip out the class from the vector, so we can bring the factor down to an integer vector with attributes "no" and "yes" :
+
+				> unclass(x)
+				[1] 2 2 1 2 1
+				attr(,"levels")
+				[1] "no"  "yes"
+
+The order of the levels can be set using **levels** argument to **factor()**
+				> x <- factor (c("yes", "yes", "no", "yes", "no"), levels = c("yes", "no"))
+				> x
+				[1] yes yes no  yes no 
+				Levels: yes no
+
+The *baseline* level is the first level in the factor ("yes" in this case), R language set normally the levels in alphabetical order. To override this, you have to change explicetely the levels.
