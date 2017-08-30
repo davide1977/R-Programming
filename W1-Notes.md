@@ -375,3 +375,101 @@ if you specify arguments R will run faster and more efficiently
 
 * **read.csv** is identical to **read.table** except the default separator is a comma, and header is always equal to TRUE
 
+## Reading Large tables
+
+How to make your life easier and prevent R from chocking
+
+* use help page of **read.table** or **read.csv** for hints
+
+* calculate the memory required to store your dataset : if it's too much stop right here
+
+* set comment.char = "" is there are no commented lines in the file
+
+* Use the colClasses argument ! specify this can make **read.table** much faster (x2 fast!) !! Of course you have to know the class of each column of your data frame, but, for ex. if every columns of the data set are "numeric", you can just set **colClasses = "numeric"**
+
+Quick and dirty way to figure out the classes of each column :
+
+				initial <- read.table("datatable.txt", nrows=100)
+				classes <- sapply(initial, class)
+				tabAll <- read.table("datatable.txt", colClasses = classes)
+
+* Set **nrows** : this doesn't make R faster, but if you can tell R how many rows there are in the date set this will help with memory usage. A mild overstimate is ok (R will read the correct number of rows anyway). You can use tool **wc** to calculate number of lines in a file
+
+### How to calculate memory requirements
+
+Ex. 1,5 millions of row and 120 columns. Suppose all columns are numeric. How many RAM it requires ?
+
+1,500,000 x 120 x 8 bytes/numeric (8 bytes per numeric object)
+
+= 1 440 000 000 bytes
+
+= 1 440 000 000 bytes / 2^20 = 1,373.29 MB = 1.34 GB
+
+The rule of thumb you'll need as mutch as the double of this RAM to read the table (it will take time, but you'll not run out of memory)
+
+## Textual Data formats
+
+**dumping** and **dputing** to save content in text file but not tables. This file contains more metadata
+
+* Unlike tables or csv files , **dump** and **dput** preserve metadata (ex. classes of objects in the dataframe - sacrificing readability), so that another user doesn't have to specify it again
+
+* Textual formats can work much better with version control programs like git which can only tracks changes meaningfully in text files
+
+* Text file can be edited
+
+* Text fle are easier to recover if partially corrupted
+
+* Text formats adhere to "Unix philosophy"
+
+* Downside : The format is not very space-efficient
+
+**dput**  function take an R object and create some code that reconstruct the object in R
+
+
+				> y <- data.frame(a = 1, b = "a")
+				
+Print the data frame y that I just created :
+
+				> y
+				  a b
+				1 1 a
+dput y to print in the stdout the structure (not very useful, only to see th code)
+
+				> dput(y)
+				structure(list(a = 1, b = structure(1L, .Label = "a", class = "factor")), .Names = c("a", 
+				"b"), row.names = c(NA, -1L), class = "data.frame")
+
+"Normal" use of dput : dput the object to a file:
+
+				> dput(y, file = "y.R")
+And then read it in R using dget
+				> new.y <- dget("y.R")
+				
+				> new.y
+				  a b
+				1 1 a
+
+The **dump** function is like the **dput** function but for multiple R objects, and you can read they back using **source**
+
+Creating objects :
+
+				> x <- "foo"
+				> y <- data.frame(a = 1, b = "a")
+
+Pass to **dump** a character vector with the name of the objects and the file where you want to store the objects in
+
+				> dump(c("x", "y"), file = "data.R")	
+
+you remove variables
+
+				> rm(x, y)
+
+Tou read the objects back with **source** and then print them
+
+				> source("data.R")
+				> y
+				  a b
+				1 1 a
+				> x
+				[1] "foo"
+				> 
