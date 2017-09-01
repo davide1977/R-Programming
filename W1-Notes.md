@@ -473,3 +473,265 @@ Tou read the objects back with **source** and then print them
 				> x
 				[1] "foo"
 				> 
+
+## Interface to the Outside World
+
+To connect to files and in general to other things :
+
+* **file** (normally text files)
+* **gzfile** (gzip compressed files)
+* **bzfile** (bzip2 compressed files)
+* **url** (webpage)
+
+must function (think at read.table for ex.) extablish this connection in background anyway...
+
+				> str(file)
+				function (description = "", open = "", blocking = TRUE, encoding = getOption("encoding"), 
+					raw = FALSE, method = getOption("url.method", "default"))
+					
+What is important here :
+
+**description** is the name of the file
+**open** is a code indicating :
+
+* *"r"* read only
+* *"w"* writing and initializing the file
+* *"a"* appending
+* *"rb"*,*"wb"*,*"ab"* reading, writing, appending in binary mode (windows)
+
+Other options are less important
+
+Connections are powerful : they let you navigate to the file or external objects, but we often don't need to deal with the connection directly, ex :
+
+				con <- file("foo.txt", "r")
+				data <- read.csv(con)
+				close(con)
+
+is the same as
+
+				data <- read.csv("foo.txt")
+
+But sometimes is useful to read only a part of a file :
+
+				con <- gzfile("words.gz")
+				x <- readLines(con, 10)
+				x
+
+Use readLines to read elements from a page
+
+				> con <- url("http://www.jhsph.edu", "r")
+				> x <- readLines(con)
+				> head(x)
+				[1] "<!DOCTYPE html>"                                               
+				[2] "<html lang=\"en\">"                                            
+				[3] ""                                                              
+				[4] "<head>"                                                        
+				[5] "<meta charset=\"utf-8\" />"                                    
+				[6] "<title>Johns Hopkins Bloomberg School of Public Health</title>"
+
+## Subsetting Objects: Basics
+
+Operators that can be used to extract subsets of R objects
+
+* single bracket: **[** *always return an object of the same class as the original*; can be used to select more than on element (except on one case)
+
+				> x <- c("a", "b", "c", "c", "d", "a")
+				> x[1]
+				[1] "a"
+				> x[2]
+				[1] "b"
+				> x[1:4]
+				[1] "a" "b" "c" "c"
+
+you can use a numeric index, but also a logical index : in R we can use a logical operator even with letters! 
+
+				> x[x > "a"]
+				[1] "b" "c" "c" "d"
+
+More complicated : we can even create a logical vector (u) and use it to subset x :
+
+				> u <- x > "a"
+				> u
+				[1] FALSE  TRUE  TRUE  TRUE  TRUE FALSE
+				> x[u]
+				[1] "b" "c" "c" "d"
+
+* double bracket **[[** extract elements froma a list or data frmae; can only be used to extract *a single element* and the class returned will not be necessarily a list or data frame
+
+* **$** extract elements of a list or data frame by **name**; semantics are similar to **[[** (may or maybe not the class of the object)
+
+## Subsetting R Objects: Lists
+
+you can use **[[** or **$** operators, or even  *[* operator
+
+> x <- list(foo = 1:4, bar = 0.6)
+
+single bracket return *always* an element with the same class of the original, so x[1] will be a list too with an element called "foo" which is a sequence of 1,2,3,4
+
+> x[1]
+$foo
+[1] 1 2 3 4
+
+if a use a double bracket I get back only a sequence (1,2,3,4). The difference with the first exemple : with signle bracket I get a list, with double bracket only the sequence.
+
+> x[[1]]
+[1] 1 2 3 4
+
+Use of $ sign : 
+> x$bar
+[1] 0.6
+
+and you can use in the same way the double bracket, with the same return (bar with quotes):
+
+> x[["bar"]]
+[1] 0.6
+
+if I use the single bracket with a name, that gives me a list with the element bar in it:
+> x["bar"]
+$bar
+[1] 0.6
+
+The advantage of using the name is that I don't have to remember where the object is in the list
+
+Attention : if you want to extract multiple elements from the list, you **have** to use the **single bracket operator** :
+
+For exemple to extract the first et the third element from the list x, I have to pass a vector composed by the element 1 end 3 to the list in single bracket operator.
+
+				> x <- list(foo = 1:4, bar = 0.6, baz = "hello")
+				> x[c(1,3)]
+				$foo
+				[1] 1 2 3 4
+
+				$baz
+				[1] "hello"
+
+
+The difference betweenn the **[[** and **$** operators is that double bracket can be used with *computed* indices, and **$** only with *literal names*
+
+				> x <- list(foo = 1:4, bar = 0.6, baz = "hello")
+				> name <-"foo"
+				> x[[name]] ## computed index for 'foo'
+				[1] 1 2 3 4
+				> x$name ## element 'name' doesn't exist
+				NULL
+				> x$foo ## element 'foo' does exist
+				[1] 1 2 3 4
+				> 
+HTe double bracket operator can take an integer sequence rather than single number.
+
+In the exemple I have a list X that contain as a first element ("a") another list :
+
+				> x <- list(a = list(10, 12, 14), b = c(3.14, 2.81))
+
+If I want to extrat te number 14 (the third element of the first element) I can do :
+
+				> x[[c(1, 3)]]
+				[1] 14
+				> x[[1]][[3]]
+				[1] 14
+
+or the first element of the second element :
+
+				> x[[c(2,1)]]
+				[1] 3.14
+				> 
+
+## Subsetting R Objects: Matrices
+
+Matrices can be subsetted in the usual way :
+
+				> x <- matrix(1:6, 2, 3)
+				> x
+					 [,1] [,2] [,3]
+				[1,]    1    3    5
+				[2,]    2    4    6
+
+extract first line of second column
+
+				> x[1,2]
+				[1] 3
+
+...or second line of the first column
+				> x[2,1]
+				[1] 2
+An index can be omitted (extract a line - first index - or a column- second index - of the matrix)
+
+				> x[1, ]
+				[1] 1 3 5
+				> x[, 2]
+				[1] 3 4
+By default, when a single element of a matrix is returned, is returned as a **vector of length 1** instead of a matrix 1x1. This behavior can be turned off setting **drop** to **FALSE**
+
+				> x[1,2]
+				[1] 3
+				> x[1,2, drop=FALSE]
+					 [,1]
+				[1,]    3
+
+Similarly of a subset of a **single row or column** : **you'll have a vector!**
+
+				> x[1, ]
+				[1] 1 3 5
+				> x[1, ,drop=FALSE]
+					 [,1] [,2] [,3]
+				[1,]    1    3    5
+				> 
+
+## Subsetting R Objects - Partial Matching
+
+Partial matching is a handy tool that can save a lot of typing, you can use it with **[[** or **$**
+
+it works straightforward with the **$** operator : the $ sign can guess the partial match
+
+				> x <- list(aardvark = 1:5)
+				> x$a
+				[1] 1 2 3 4 5
+
+But this doesn't work directly with the **[[** sign, because it expects an exact match, so you have to specify the **exact = FALSE** parameter :
+
+				> x[[a]]
+				Erreur : objet 'a' introuvable
+				> x[["a"]]
+				NULL
+				> x[["a", exact = FALSE]]
+				[1] 1 2 3 4 5
+				> 
+
+## Subsetting - Removing Missing Values
+
+Removing NA Values is a common task. You can do it creating a logical vector (bad) with **is.na** function : that tell which are missing, so you have to negate it
+
+				> x <- c(1, 2, NA, 4, NA, 5)
+				> bad <- is.na(x)
+				> bad
+				[1] FALSE FALSE  TRUE FALSE  TRUE FALSE
+				> x[!bad]
+				[1] 1 2 4 5
+				> 
+
+If there are multiple objects and you want to take subset with no missing values.
+
+				> x <- c(1, 2, NA, 4, NA, 5)
+				> y <- c("a", "b", NA, "d", NA, "f")
+				> good <- complete.cases(x, y)
+				> good
+				[1]  TRUE  TRUE FALSE  TRUE FALSE  TRUE
+				> x[good]
+				[1] 1 2 4 5
+				> y[good]
+				[1] "a" "b" "d" "f"
+
+ >> Be careful, two objects have to have THE SAME LENGTH and the same "values"!!
+ 
+				>x=c(1,2,3,4,NA)
+				> complete.cases(x)
+				[1] TRUE TRUE TRUE TRUE FALSE
+				> y=c(1,2,3,4,5,NA)
+				> complete.cases(y)
+				[1] TRUE TRUE TRUE TRUE TRUE FALSE
+				> complete.cases(x,y)
+				Error in complete.cases(x, y) : not all arguments have the same length
+				>k=c(1,2,3,4,NA)
+				> l=c(1,2,3,NA,5)
+				> complete.cases(k,l)
+				[1] TRUE TRUE TRUE FALSE FALSE
