@@ -556,7 +556,7 @@ More complicated : we can even create a logical vector (u) and use it to subset 
 				> x[u]
 				[1] "b" "c" "c" "d"
 
-* double bracket **[[** extract elements froma a list or data frmae; can only be used to extract *a single element* and the class returned will not be necessarily a list or data frame
+* double bracket **[[** extract elements from a list or data frame; can only be used to extract *a single element* and the class returned will not be necessarily a list or data frame
 
 * **$** extract elements of a list or data frame by **name**; semantics are similar to **[[** (may or maybe not the class of the object)
 
@@ -735,3 +735,87 @@ If there are multiple objects and you want to take subset with no missing values
 				> l=c(1,2,3,NA,5)
 				> complete.cases(k,l)
 				[1] TRUE TRUE TRUE FALSE FALSE
+
+You can also use **complete.cases** to remove Na from Data Frames (Matrix) :
+
+				> airquality[1:6, ]
+				  Ozone Solar.R Wind Temp Month Day
+				1    41     190  7.4   67     5   1
+				2    36     118  8.0   72     5   2
+				3    12     149 12.6   74     5   3
+				4    18     313 11.5   62     5   4
+				5    NA     NA  14.3   56     5   5
+				6    28     NA  14.9   66     5   6
+
+So I can create a logical vector **good** that tells me which rows are complete :
+				> good <- complete.cases(airquality)
+
+Then I subset the airquality matrix and I see all the rows with missing values are gone :
+
+				> airquality[good, ][1:6, ]
+				  Ozone Solar.R Wind Temp Month Day
+				1    41     190  7.4   67     5   1
+				2    36     118  8.0   72     5   2
+				3    12     149 12.6   74     5   3
+				4    18     313 11.5   62     5   4
+				7    23     299  8.6   65     5   7
+
+## Vectorized Operations
+
+Vectorized operationsa are on of the features that makes R easy to use on command line. The idea with *vectorized operations* is that things can happen in parallel when you do operations
+
+				> x <- 1:4; y <- 6:9
+
+If I add the two vectors, I add in fact each element with the correspondent of the other vector : the first element of X with the first of Y, the second of x with the second of y etc. : so this happens in parallel without need of loops like in other languages
+
+				> x + y
+				[1]  7  9 11 13
+
+Similarly you can use < or == etc. to build logical vectors :
+
+				> x > 2
+				[1] FALSE FALSE  TRUE  TRUE
+				> y == 8
+				[1] FALSE FALSE  TRUE FALSE
+				> x >= 2
+				[1] FALSE  TRUE  TRUE  TRUE
+
+You can also * / - etc. etc. in parallel 
+
+> x * y
+[1]  6 14 24 36
+> x / y
+[1] 0.1666667 0.2857143 0.3750000 0.4444444
+
+Similarly you can do it with matrices
+
+> x <- matrix(1:4, 2, 2); y <- matrix(rep(10, 4), 2, 2)
+> y
+     [,1] [,2]
+[1,]   10   10
+[2,]   10   10
+> x
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+
+So you can do an "element wise" multiplication (element 1,1 of x is multiplicated with the 1,1 of y etc.), **not a matrix multiplication**  :
+
+> x * y
+     [,1] [,2]
+[1,]   10   30
+[2,]   20   40
+
+The same with division :
+
+> x / y
+     [,1] [,2]
+[1,]  0.1  0.3
+[2,]  0.2  0.4
+
+If you want to do a **true** matrix multiplication you have to do the **%*%** symbol
+
+> x %*% y
+     [,1] [,2]
+[1,]   40   40
+[2,]   60   60
