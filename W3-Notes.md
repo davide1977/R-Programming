@@ -503,4 +503,153 @@ List of 6
 Warning message:
 In log(-1) : production de NaN
 
+## Debugging Tools - Basic Tools
 
+* **traceback** print how many deeper in the function you are. Does nothing if there's no error.
+
+* **debug**  flags a function for debug mode which alloxs you to step through execution of a function one line at a time
+
+* **browser** suspends the execution of a function wherever it is called in your code and puts the function in debug mode (similar and related to debug function: sometimes in place to debug en entire function you want to start to debug from a exact point of a function)
+
+* **trace** allows you to insert debugging code into a function without editing it, and in a specific place (handful if you are debugging someone else's code)
+
+* **recover** its an "error handler" : allows you to modifiy the error behavior so that you can browse the function call stack
+
+(more pratically, you can also just use print/cat in a function to follow it...)
+
+## Debugging Tools - Using Tools
+
+**traceback** you have to call traceback right away after the error to have a result
+
+				> mean(x)
+				Error in mean(x) : objet 'x' introuvable
+				> traceback()
+				1: mean(x)
+
+more interesting :
+
+> lm(y - x)
+Error in stats::model.frame(formula = y - x, drop.unused.levels = TRUE) : 
+  objet 'y' introuvable
+> traceback()
+4: stats::model.frame(formula = y - x, drop.unused.levels = TRUE)
+3: eval(mf, parent.frame())
+2: eval(mf, parent.frame())
+1: lm(y - x)
+
+**debug** you can debug any function.
+
+				> debug(lm)
+				> lm(y -x)
+				debugging in: lm(y - x)
+				debug: {
+					ret.x <- x
+					ret.y <- y
+					cl <- match.call()
+					mf <- match.call(expand.dots = FALSE)
+					m <- match(c("formula", "data", "subset", "weights", "na.action", 
+						"offset"), names(mf), 0L)
+					mf <- mf[c(1L, m)]
+					mf$drop.unused.levels <- TRUE
+					mf[[1L]] <- quote(stats::model.frame)
+					mf <- eval(mf, parent.frame())
+					if (method == "model.frame") 
+						return(mf)
+					else if (method != "qr") 
+						warning(gettextf("method = '%s' is not supported. Using 'qr'", 
+							method), domain = NA)
+					mt <- attr(mf, "terms")
+					y <- model.response(mf, "numeric")
+					w <- as.vector(model.weights(mf))
+					if (!is.null(w) && !is.numeric(w)) 
+						stop("'weights' must be a numeric vector")
+					offset <- as.vector(model.offset(mf))
+					if (!is.null(offset)) {
+						if (length(offset) != NROW(y)) 
+							stop(gettextf("number of offsets is %d, should equal %d (number of observations)", 
+								length(offset), NROW(y)), domain = NA)
+					}
+					if (is.empty.model(mt)) {
+						x <- NULL
+						z <- list(coefficients = if (is.matrix(y)) matrix(, 0, 
+							3) else numeric(), residuals = y, fitted.values = 0 * 
+							y, weights = w, rank = 0L, df.residual = if (!is.null(w)) sum(w != 
+							0) else if (is.matrix(y)) nrow(y) else length(y))
+						if (!is.null(offset)) {
+							z$fitted.values <- offset
+							z$residuals <- y - offset
+						}
+					}
+					else {
+						x <- model.matrix(mt, mf, contrasts)
+						z <- if (is.null(w)) 
+							lm.fit(x, y, offset = offset, singular.ok = singular.ok, 
+								...)
+						else lm.wfit(x, y, w, offset = offset, singular.ok = singular.ok, 
+							...)
+					}
+					class(z) <- c(if (is.matrix(y)) "mlm", "lm")
+					z$na.action <- attr(mf, "na.action")
+					z$offset <- offset
+					z$contrasts <- attr(x, "contrasts")
+					z$xlevels <- .getXlevels(mt, mf)
+					z$call <- cl
+					z$terms <- mt
+					if (model) 
+						z$model <- mf
+					if (ret.x) 
+						z$x <- x
+					if (ret.y) 
+						z$y <- y
+					if (!qr) 
+						z$qr <- NULL
+					z
+				}
+				Browse[2]> 
+
+"Browse" is in the function environment . If I press n it execute a line at once until it gets the error...
+
+Browse[2]> n
+debug: ret.x <- x
+Browse[2]> n
+debug: ret.y <- y
+Browse[2]> n
+debug: cl <- match.call()
+Browse[2]> n
+debug: mf <- match.call(expand.dots = FALSE)
+Browse[2]> n
+debug: m <- match(c("formula", "data", "subset", "weights", "na.action", 
+    "offset"), names(mf), 0L)
+Browse[2]> n
+debug: mf <- mf[c(1L, m)]
+Browse[2]> n
+debug: mf$drop.unused.levels <- TRUE
+Browse[2]> n
+debug: mf[[1L]] <- quote(stats::model.frame)
+Browse[2]> n
+debug: mf <- eval(mf, parent.frame())
+Browse[2]> n
+Error in stats::model.frame(formula = y - x, drop.unused.levels = TRUE) : 
+  objet 'y' introuvable
+
+  and moreover you can call debug function inside the debugger to debug another function inside the function
+  
+  **recover**
+  
+  I try to read.csv a file that does'nt exist, and with recover it shows me the different levels.
+				> options(error = recover)
+				> read.csv("nosuchfile")
+				Error in file(file, "rt") : impossible d'ouvrir la connexion
+				De plus : Warning message:
+				In file(file, "rt") :
+				  impossible d'ouvrir le fichier 'nosuchfile' : No such file or directory
+
+				Enter a frame number, or 0 to exit   
+
+				1: read.csv("nosuchfile")
+				2: read.table(file = file, header = header, sep = sep, quote = quote, dec = de
+				3: file(file, "rt")
+
+				Selection: 
+
+So you can press the number and go into the environment of different functions
